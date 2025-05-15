@@ -321,7 +321,9 @@ def generate_reference_image(request):
             # Get the reference image and description
             reference_image = request.FILES.get('referenceImage')
             image_description = request.POST.get('imageDescription')
-
+            print('logs django')
+            print(reference_image)
+            print(image_description)
             if not reference_image:
                 print('no reference image')
                 return JsonResponse({
@@ -363,7 +365,7 @@ def generate_reference_image(request):
                             Additional requirements: {image_description}""",
                             n=1,
                             size="1024x1024",
-                            quality="medium"
+                            quality="low"
                         )
                         print(result)
 
