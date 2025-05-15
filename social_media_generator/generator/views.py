@@ -111,7 +111,7 @@ def generate_content(request):
             if custom_image_prompt:
                 image_prompt = custom_image_prompt
             else:
-                image_prompt = f"""Generate a photorealistic any {industry} related image for the linkedIn post
+                image_prompt = f"""Generate a photorealistic photo of two people handshaking related to {industry} for the linkedIn post
                 Here are more details about the post: {generated_text[:100]}"""
 
             try:
@@ -316,6 +316,7 @@ def generate_reference_image(request):
             image_description = request.POST.get('imageDescription')
 
             if not reference_image:
+                print('no refernece image')
                 return JsonResponse({
                     'status': 'error',
                     'message': 'No reference image provided'
@@ -383,6 +384,7 @@ def generate_reference_image(request):
                 })
 
             except Exception as e:
+
                 print(f"Error in image generation: {str(e)}")
                 return JsonResponse({
                     'status': 'error',

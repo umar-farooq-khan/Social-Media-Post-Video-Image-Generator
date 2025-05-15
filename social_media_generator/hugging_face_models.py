@@ -11,10 +11,10 @@ client = InferenceClient(
 
 # output is a PIL.Image object
 image = client.text_to_image(
-    "Astronaut riding a horse",
+    "Typical Irish homes in a street of Dublin with a guy riding a horse",
     model="stabilityai/stable-diffusion-3.5-large",
 )
-image.save("astronaut_riding_horse.png")
+image.save("irishhomes.png")
 
 # ✅ Display the image (opens with default image viewer)
 image.show()
