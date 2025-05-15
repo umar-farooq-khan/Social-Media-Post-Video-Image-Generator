@@ -29,39 +29,6 @@ client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 def index(request):
     return render(request, 'generator/index.html')
 
-def scrape_linkedin_posts(profile_url):
-    try:
-        print(f"Starting LinkedIn scraping for URL: {profile_url}")  # Debug print
-        
-        # Login to LinkedIn
-        email = os.getenv('LINKEDIN_EMAIL')
-        password = os.getenv('LINKEDIN_PASSWORD')
-        print(f"Using email: {email}")  # Debug print
-        
-        # Initialize the scraper
-        print("Attempting to login to LinkedIn...")  # Debug print
-        driver = actions.login(email, password)
-        print("Successfully logged in to LinkedIn")  # Debug print
-        
-        # Get the person's profile
-        print(f"Fetching profile data for: {profile_url}")  # Debug print
-        person = Person(profile_url, driver=driver)
-        
-        # Get their posts
-        posts = []
-        print("Fetching posts...")  # Debug print
-        for post in person.posts[:5]:  # Get latest 5 posts
-            if post.text:  # Only add posts that have text
-                print(f"Found post: {post.text[:100]}...")  # Debug print first 100 chars
-                posts.append(post.text)
-        
-        print(f"Successfully scraped {len(posts)} posts")  # Debug print
-        driver.quit()
-        return posts
-    except Exception as e:
-        print(f"Error in scrape_linkedin_posts: {str(e)}")  # Debug print
-        pdb.set_trace()  # This will pause execution when an error occurs
-        return []
 
 
 def generate_post(request):
