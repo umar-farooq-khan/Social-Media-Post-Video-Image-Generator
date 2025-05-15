@@ -363,7 +363,7 @@ def generate_reference_image(request):
                             Additional requirements: {image_description}""",
                             n=1,
                             size="1024x1024",
-                            quality="high"
+                            quality="medium"
                         )
                         print(result)
 
