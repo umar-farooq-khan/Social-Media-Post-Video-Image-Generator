@@ -403,3 +403,8 @@ def generate_reference_image(request):
 
 def healthcheck(request):
     return JsonResponse({'status': 'ok'})
+
+
+#git pull
+#sudo docker compose build
+#sudo docker compose up -d
