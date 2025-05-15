@@ -184,11 +184,11 @@ def generate_custom_content(request):
     if request.method == 'POST':
         try:
             # Get form data
-            business_details= '''TE Connectivity helps engineers design and build the technologies transforming how people live, work, and connect As a go-to engineering partner for innovation'''
-            business_name = 'TE Connecitivity'
             tone = request.POST.get('tone', '')
             style = request.POST.get('style', '')
-            custom_prompt= '''What is the profit, loss, net sales in 2024'''
+            business_name= request.POST.get('businessName', '')
+            business_details= request.POST.get('businessDescription', '')
+            custom_prompt = request.POST.get('customPrompt', '')
             pdf_file = request.FILES.get('pdf_document')
             
             # Process images
@@ -196,6 +196,7 @@ def generate_custom_content(request):
 
             # Prepare the raw text from business details and custom prompt
             raw_text = f"""
+            Business Name: {business_name}
             Business Description: {business_details}
             Custom Requirements: {custom_prompt}
             """
@@ -254,7 +255,6 @@ def generate_custom_content(request):
             Tone: {tone}
             Style: {style}
             Custom Requirements: {custom_prompt}
-            
             Please create a post that matches the specified tone and style while incorporating the custom requirements and relevant context from both the business information and any uploaded document.
             """
 
