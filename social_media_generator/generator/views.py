@@ -367,7 +367,7 @@ def generate_reference_image(request):
                             size="1024x1024",
                             quality="low"
                         )
-                        print(result)
+                        print(result.usage)
 
                 # Clean up the temporary file
                 os.unlink(temp_file.name)
