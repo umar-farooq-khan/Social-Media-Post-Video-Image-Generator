@@ -323,7 +323,7 @@ def generate_reference_image(request):
             image_description = request.POST.get('imageDescription')
 
             if not reference_image:
-                print('no refernece image')
+                print('no reference image')
                 return JsonResponse({
                     'status': 'error',
                     'message': 'No reference image provided'
@@ -360,38 +360,26 @@ def generate_reference_image(request):
                             model="gpt-image-1",
                             image=image_file,
                             prompt=f"""Generate a photorealistic image of similar image which is given as a reference on a white background. 
-                            Additional requirements: {image_description}"""
+                            Additional requirements: {image_description}""",
+                            n=1,
+                            size="1024x1024",
+                            quality="low"
                         )
+                        print(result)
 
                 # Clean up the temporary file
                 os.unlink(temp_file.name)
 
                 # Get the base64 image data
-                image_base64 = result.data[0].b64_json
-                image_bytes = base64.b64decode(image_base64)
-
-                # Generate a unique filename
-                timestamp = int(time.time())
-                output_filename = f"generated_image_{timestamp}.png"
-                output_path = os.path.join(settings.MEDIA_ROOT, 'generated_images', output_filename)
-
-                # Ensure the directory exists
-                os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
-                # Save the image to a file
-                with open(output_path, "wb") as f:
-                    f.write(image_bytes)
-
-                # Get the URL for the saved image
-                image_url = f"/media/generated_images/{output_filename}"
+                image_b64 = result.data[0].b64_json
+                edited_image = f"data:image/png;base64,{image_b64}"
 
                 return JsonResponse({
                     'status': 'success',
-                    'generated_image_url': image_url
+                    'image_data': edited_image
                 })
 
             except Exception as e:
-
                 print(f"Error in image generation: {str(e)}")
                 return JsonResponse({
                     'status': 'error',

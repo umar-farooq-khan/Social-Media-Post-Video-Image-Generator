@@ -84,6 +84,8 @@
                                 <div class="mb-3">
                                     <input type="file" class="form-control" id="referenceImage" name="referenceImage" accept="image/*" required>
                                 </div>
+                                <div id="imagePreview2"></div>
+
                                 <div id="imagePreview" class="image-container" style="display: none;">
                                     <h5>Reference Image Preview:</h5>
                                     <img id="previewImage" class="preview-image" src="" alt="Reference image preview">
@@ -167,7 +169,7 @@
 
                 if (data.status === 'success') {
                     // Display results
-                    document.getElementById('generatedImage').src = data.generated_image_url;
+                    document.getElementById('generatedImage').src = data.image_data;
                     document.querySelector('.result-section').style.display = 'block';
                 } else {
                     alert('Error: ' + data.message);
