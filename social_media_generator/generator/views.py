@@ -183,14 +183,19 @@ def generate_content(request):
 def generate_custom_content(request):
     if request.method == 'POST':
         try:
+            print("=== Starting generate_custom_content ===")
             # Get form data
             tone = request.POST.get('tone', '')
             style = request.POST.get('style', '')
-            business_name= request.POST.get('businessName', '')
-            business_details= request.POST.get('businessDescription', '')
+            business_name = request.POST.get('businessName', '')
+            business_details = request.POST.get('businessDescription', '')
             custom_prompt = request.POST.get('customPrompt', '')
             pdf_file = request.FILES.get('pdf_document')
             
+            print(f"Received data - Business: {business_name}, Tone: {tone}, Style: {style}")
+            print(f"Custom prompt: {custom_prompt}")
+            print(f"PDF file received: {pdf_file is not None}")
+
             # Process images
             processed_images = []
 
@@ -200,9 +205,11 @@ def generate_custom_content(request):
             Business Description: {business_details}
             Custom Requirements: {custom_prompt}
             """
+            print(f"Raw text prepared: {raw_text[:200]}...")
 
             # Process PDF if uploaded
             if pdf_file:
+                print("Processing PDF file...")
                 # Save PDF to temporary file
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as temp_pdf:
                     for chunk in pdf_file.chunks():
@@ -218,12 +225,15 @@ def generate_custom_content(request):
                     
                     # Add PDF content to raw text
                     raw_text += f"\nAdditional Context from PDF:\n{pdf_text}"
+                    print(f"PDF processed, added {len(pdf_text)} characters to raw text")
                 finally:
                     # Clean up temporary file
                     os.unlink(temp_pdf_path)
+                    print("Temporary PDF file cleaned up")
 
             # Split the text using Character Text Splitter
             try:
+                print("\n=== Starting RAG Processing ===")
                 text_splitter = CharacterTextSplitter(
                     separator="\n",
                     chunk_size=800,
@@ -231,20 +241,29 @@ def generate_custom_content(request):
                     length_function=len,
                 )
                 texts = text_splitter.split_text(raw_text)
+                print(f"Text split into {len(texts)} chunks")
 
                 # Create embeddings and vector store
+                print("Creating OpenAI embeddings...")
                 embeddings = OpenAIEmbeddings()
+                print("Creating FAISS vector store...")
                 document_search = FAISS.from_texts(texts, embeddings)
+                print("Vector store created successfully")
 
                 # Search for relevant context
+                print("Searching for relevant context...")
                 relevant_docs = document_search.similarity_search(custom_prompt, k=3)
                 context = "\n".join([doc.page_content for doc in relevant_docs])
-                print('context', context)
+                print(f"Found relevant context: {context[:200]}...")
             except Exception as e:
-                print(f"Error in RAG processing: {str(e)}")
-                context = raw_text  # Fallback to using raw text if RAG fails
+                print(f"\n!!! RAG Processing Error !!!")
+                print(f"Error type: {type(e)}")
+                print(f"Error message: {str(e)}")
+                print("Falling back to raw text")
+                context = raw_text
 
             # Generate post text using ChatGPT with RAG context
+            print("\n=== Generating Post with ChatGPT ===")
             prompt = f"""
             Create a linkedIn post for a business with the following details:
             
@@ -257,9 +276,9 @@ def generate_custom_content(request):
             Custom Requirements: {custom_prompt}
             Please create a post that matches the specified tone and style while incorporating the custom requirements and relevant context from both the business information and any uploaded document.
             """
-
+            print("Sending request to OpenAI...")
             response = openai.chat.completions.create(
-                model="gpt-4o-mini",
+                model="gpt-4",
                 messages=[
                     {"role": "system", "content": "You are a social media marketing expert."},
                     {"role": "user", "content": prompt}
@@ -267,34 +286,18 @@ def generate_custom_content(request):
             )
 
             generated_text = response.choices[0].message.content
-            print(f"Generated text: {generated_text}")  # Debug print
-            #
-            # # Generate image based on the generated text
-            # image_prompt = f"""Create a professional business image that represents: {generated_text[:200]}"""
-            #
-            # try:
-            #     # Generate a new image using DALL-E
-            #     image_response = openai.images.generate(
-            #         model="dall-e-3",
-            #         prompt=image_prompt,
-            #         size="1024x1024",
-            #         quality="standard",
-            #         n=1,
-            #     )
-            #     generated_image_url = image_response.data[0].url
-            #     print(f"Generated image URL: {generated_image_url}")  # Debug print
-            # except Exception as e:
-            #     print(f"Error generating image: {str(e)}")
-            #     generated_image_url = None
+            print(f"Generated text: {generated_text[:200]}...")
+            print("=== Process Complete ===")
 
             return JsonResponse({
                 'status': 'success',
                 'generated_text': generated_text
-                # 'generated_image_url': generated_image_url
             })
 
         except Exception as e:
-            print(f"Error in generate_custom_content: {str(e)}")  # Debug print
+            print(f"\n!!! Top Level Error in generate_custom_content !!!")
+            print(f"Error type: {type(e)}")
+            print(f"Error message: {str(e)}")
             return JsonResponse({
                 'status': 'error',
                 'message': str(e)

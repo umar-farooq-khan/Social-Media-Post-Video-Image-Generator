@@ -115,7 +115,7 @@
                                          placeholder="Enter specific details about what you want in your post. For example: 'Create a post about our new product launch, highlighting its key features and benefits">post for highlighting diverse experience of our new employee in two paragraphs and a pun at the end. CV attached. </textarea>
                                 </div>
                             </div>
-                            
+
                             <!-- PDF Upload -->
                             <div class="mb-4">
                                 <h4>Upload PDF Document</h4>
@@ -171,20 +171,13 @@
 
             // Prepare form data
             const formData = new FormData();
-            const businessDetails = {
-                name: document.getElementById('businessName').value,
-                description: document.getElementById('businessDescription').value
-            };
-
-            formData.append('business_details', JSON.stringify(businessDetails));
+            
+            // Add form fields directly
+            formData.append('businessName', document.getElementById('businessName').value);
+            formData.append('businessDescription', document.getElementById('businessDescription').value);
             formData.append('tone', document.getElementById('tone').value);
             formData.append('style', document.getElementById('style').value);
-            formData.append('custom_prompt', document.getElementById('customPrompt').value);
-
-            const imageFiles = document.getElementById('images').files;
-            for (let i = 0; i < imageFiles.length; i++) {
-                formData.append('images', imageFiles[i]);
-            }
+            formData.append('customPrompt', document.getElementById('customPrompt').value);
 
             // Add PDF file if uploaded
             const pdfFile = document.getElementById('pdf_document').files[0];
@@ -193,31 +186,25 @@
             }
 
             try {
+                console.log('Sending request to server...');
                 const response = await fetch('/api/generate-custom/', {
                     method: 'POST',
                     body: formData
                 });
 
+                console.log('Received response from server');
                 const data = await response.json();
+                console.log('Response data:', data);
 
                 if (data.status === 'success') {
                     // Display results
                     document.getElementById('generatedText').textContent = data.generated_text;
-                    
-                    // Handle image display
-                    const imageSection = document.getElementById('imageSection');
-                    if (data.generated_image_url) {
-                        document.getElementById('generatedImage').src = data.generated_image_url;
-                        imageSection.style.display = 'block';
-                    } else {
-                        imageSection.style.display = 'none';
-                    }
-                    
                     document.querySelector('.result-section').style.display = 'block';
                 } else {
                     alert('Error: ' + data.message);
                 }
             } catch (error) {
+                console.error('Error:', error);
                 alert('Error: ' + error.message);
             } finally {
                 // Hide loading spinner
