@@ -10,7 +10,7 @@ from PIL import Image
 import requests
 from io import BytesIO
 import time
-import pdb  # Add this for debugging
+import pdb 
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores.faiss import FAISS

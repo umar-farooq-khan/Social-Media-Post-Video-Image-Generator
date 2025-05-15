@@ -25,7 +25,6 @@ def call_bedrock_claude(prompt_text):
             accept="application/json"
         )
 
-        # Parse and return the result
         result = json.loads(response["body"].read())
         return result.get("completion", "No completion returned.")
 
