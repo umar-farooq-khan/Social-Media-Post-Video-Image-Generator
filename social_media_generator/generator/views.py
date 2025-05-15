@@ -359,11 +359,11 @@ def generate_reference_image(request):
                         result = client.images.edit(
                             model="gpt-image-1",
                             image=image_file,
-                            prompt=f"""Generate a photorealistic image of similar image which is given as a reference on a white background. 
+                            prompt=f"""Generate a photorealistic image of similar image which is given as a reference with . 
                             Additional requirements: {image_description}""",
                             n=1,
                             size="1024x1024",
-                            quality="low"
+                            quality="high"
                         )
                         print(result)
 
