@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Social Media Post Generator</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .loading {
+            display: none;
+        }
+        .result-section {
+            display: none;
+        }
+        .preview-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .navbar {
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        .nav-link {
+            color: #333;
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            color: #0d6efd;
+        }
+        .nav-link.active {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container">
+            <a class="navbar-brand" href="/api">Social Media Post Generator</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/api">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/api/custom-prompt">Custom Prompt</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/api/reference-image">Reference Image</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <h1 class="text-center mb-4">LinkedIn Post Generator with RAG</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <form id="customPromptForm" enctype="multipart/form-data">
+                            <!-- Business Details -->
+                            <div class="mb-4">
+                                <h4>Business Details</h4>
+                                <div class="mb-3">
+                                    <label for="businessName" class="form-label">Business Name</label>
+                                    <input type="text" class="form-control" id="businessName" name="businessName" >
+                                </div>
+                                <div class="mb-3">
+                                    <label for="businessDescription" class="form-label">Business Description</label>
+                                    <textarea class="form-control" id="businessDescription" name="businessDescription" rows="3" ></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Post Settings -->
+                            <div class="mb-4">
+                                <h4>Post Settings</h4>
+                                <div class="mb-3">
+                                    <label for="tone" class="form-label">Tone</label>
+                                    <select class="form-select" id="tone" name="tone" >
+                                        <option value="professional">Professional, LinkedIn styled</option>
+                                        <option value="casual">Casual</option>
+                                        <option value="friendly">Friendly</option>
+                                        <option value="humorous">Humorous</option>
+                                        <option value="formal">Formal</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="style" class="form-label">Style</label>
+                                    <select class="form-select" id="style" name="style">
+                                        <option value="modern">Modern</option>
+                                        <option value="classic">Classic</option>
+                                        <option value="minimalist">Minimalist</option>
+                                        <option value="bold">Bold</option>
+                                        <option value="elegant">Elegant</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Custom Prompt -->
+                            <div class="mb-4">
+                                <h4>Custom Prompt</h4>
+                                <div class="mb-3">
+                                    <label for="customPrompt" class="form-label">Enter your custom prompt</label>
+                                    <textarea class="form-control" id="customPrompt" name="customPrompt" rows="4" 
+                                         placeholder="Enter specific details about what you want in your post. For example: 'Create a post about our new product launch, highlighting its key features and benefits'">post for highlighting diverse experience of our new employee. CV attached. </textarea>
+                                </div>
+                            </div>
+
+                            <!-- Image Upload -->
+                            <div class="mb-4">
+                                <h4>Upload Images (Optional)</h4>
+                                <div class="mb-3">
+                                    <input type="file" class="form-control" id="images" name="images" multiple accept="image/*">
+                                </div>
+                            </div>
+
+                            <!-- PDF Upload -->
+                            <div class="mb-4">
+                                <h4>Upload PDF Document (Optional)</h4>
+                                <div class="mb-3">
+                                    <input type="file" class="form-control" id="pdf_document" name="pdf_document" accept=".pdf">
+                                    <small class="text-muted">Upload a PDF document to provide additional context for post generation</small>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">Generate Post</button>
+                        </form>
+
+                        <!-- Loading Spinner -->
+                        <div class="loading text-center mt-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Generating your post...</p>
+                        </div>
+
+                        <!-- Results Section -->
+                        <div class="result-section mt-4">
+                            <h4>Generated Content</h4>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Post Text</h5>
+                                    <p id="generatedText" class="card-text"></p>
+                                </div>
+                            </div>
+                            <div id="imageSection" class="card mb-3" style="display: none;">
+                                <div class="card-body">
+                                    <h5 class="card-title">Generated Image</h5>
+                                    <img id="generatedImage" class="img-fluid rounded" style="max-width: 100%; height: auto;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        document.getElementById('customPromptForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Show loading spinner
+            document.querySelector('.loading').style.display = 'block';
+            document.querySelector('.result-section').style.display = 'none';
+
+            // Prepare form data
+            const formData = new FormData();
+            const businessDetails = {
+                name: document.getElementById('businessName').value,
+                description: document.getElementById('businessDescription').value
+            };
+
+            formData.append('business_details', JSON.stringify(businessDetails));
+            formData.append('tone', document.getElementById('tone').value);
+            formData.append('style', document.getElementById('style').value);
+            formData.append('custom_prompt', document.getElementById('customPrompt').value);
+
+            const imageFiles = document.getElementById('images').files;
+            for (let i = 0; i < imageFiles.length; i++) {
+                formData.append('images', imageFiles[i]);
+            }
+
+            // Add PDF file if uploaded
+            const pdfFile = document.getElementById('pdf_document').files[0];
+            if (pdfFile) {
+                formData.append('pdf_document', pdfFile);
+            }
+
+            try {
+                const response = await fetch('/api/generate-custom/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    // Display results
+                    document.getElementById('generatedText').textContent = data.generated_text;
+                    
+                    // Handle image display
+                    const imageSection = document.getElementById('imageSection');
+                    if (data.generated_image_url) {
+                        document.getElementById('generatedImage').src = data.generated_image_url;
+                        imageSection.style.display = 'block';
+                    } else {
+                        imageSection.style.display = 'none';
+                    }
+                    
+                    document.querySelector('.result-section').style.display = 'block';
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                // Hide loading spinner
+                document.querySelector('.loading').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html> 
