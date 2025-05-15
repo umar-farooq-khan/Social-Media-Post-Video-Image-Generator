@@ -9,4 +9,5 @@ langchain
 langchain-community
 pypdf>=3.0.0
 tiktoken>=0.5.0
+numpy
 
