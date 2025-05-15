@@ -5,3 +5,11 @@ services:
     build: .
     ports:
       - "80:8000"
+    volumes:
+      - .:/app
+    environment:
+      - DEBUG=1
+      - DJANGO_SETTINGS_MODULE=social_media_generator.settings
+    command: >
+      sh -c "python manage.py migrate &&
+             gunicorn social_media_generator.wsgi:application --bind 0.0.0.0:8000 --workers 4 --reload"

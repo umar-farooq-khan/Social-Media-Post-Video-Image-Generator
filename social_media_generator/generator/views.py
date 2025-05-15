@@ -222,22 +222,26 @@ def generate_custom_content(request):
                     os.unlink(temp_pdf_path)
 
             # Split the text using Character Text Splitter
-            text_splitter = CharacterTextSplitter(
-                separator="\n",
-                chunk_size=800,
-                chunk_overlap=200,
-                length_function=len,
-            )
-            texts = text_splitter.split_text(raw_text)
+            try:
+                text_splitter = CharacterTextSplitter(
+                    separator="\n",
+                    chunk_size=800,
+                    chunk_overlap=200,
+                    length_function=len,
+                )
+                texts = text_splitter.split_text(raw_text)
 
-            # Create embeddings and vector store
-            embeddings = OpenAIEmbeddings()
-            document_search = FAISS.from_texts(texts, embeddings)
+                # Create embeddings and vector store
+                embeddings = OpenAIEmbeddings()
+                document_search = FAISS.from_texts(texts, embeddings)
 
-            # Search for relevant context
-            relevant_docs = document_search.similarity_search(custom_prompt, k=3)
-            context = "\n".join([doc.page_content for doc in relevant_docs])
-            print('context', context)
+                # Search for relevant context
+                relevant_docs = document_search.similarity_search(custom_prompt, k=3)
+                context = "\n".join([doc.page_content for doc in relevant_docs])
+                print('context', context)
+            except Exception as e:
+                print(f"Error in RAG processing: {str(e)}")
+                context = raw_text  # Fallback to using raw text if RAG fails
 
             # Generate post text using ChatGPT with RAG context
             prompt = f"""
@@ -255,7 +259,7 @@ def generate_custom_content(request):
             """
 
             response = openai.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": "You are a social media marketing expert."},
                     {"role": "user", "content": prompt}
@@ -264,29 +268,29 @@ def generate_custom_content(request):
 
             generated_text = response.choices[0].message.content
             print(f"Generated text: {generated_text}")  # Debug print
-
-            # Generate image based on the generated text
-            image_prompt = f"""Create a professional business image that represents: {generated_text[:200]}"""
-            
-            try:
-                # Generate a new image using DALL-E
-                image_response = openai.images.generate(
-                    model="dall-e-3",
-                    prompt=image_prompt,
-                    size="1024x1024",
-                    quality="standard",
-                    n=1,
-                )
-                generated_image_url = image_response.data[0].url
-                print(f"Generated image URL: {generated_image_url}")  # Debug print
-            except Exception as e:
-                print(f"Error generating image: {str(e)}")
-                generated_image_url = None
+            #
+            # # Generate image based on the generated text
+            # image_prompt = f"""Create a professional business image that represents: {generated_text[:200]}"""
+            #
+            # try:
+            #     # Generate a new image using DALL-E
+            #     image_response = openai.images.generate(
+            #         model="dall-e-3",
+            #         prompt=image_prompt,
+            #         size="1024x1024",
+            #         quality="standard",
+            #         n=1,
+            #     )
+            #     generated_image_url = image_response.data[0].url
+            #     print(f"Generated image URL: {generated_image_url}")  # Debug print
+            # except Exception as e:
+            #     print(f"Error generating image: {str(e)}")
+            #     generated_image_url = None
 
             return JsonResponse({
                 'status': 'success',
-                'generated_text': generated_text,
-                'generated_image_url': generated_image_url
+                'generated_text': generated_text
+                # 'generated_image_url': generated_image_url
             })
 
         except Exception as e:
