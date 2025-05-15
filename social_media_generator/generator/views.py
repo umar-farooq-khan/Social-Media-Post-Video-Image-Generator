@@ -135,7 +135,7 @@ def generate_content(request):
                         print(f"Error processing uploaded image: {str(e)}")
                         print('Falling back to generating new image')
                         result = client.images.generate(
-                            model="dall-e-3",
+                            model="gpt-image-1",
                             prompt=image_prompt,
                             size="1024x1024",
                         )
