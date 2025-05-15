@@ -102,6 +102,19 @@
                                 </div>
                             </div>
 
+                            <!-- Image Quality -->
+                            <div class="mb-4">
+                                <h4>Image Quality</h4>
+                                <div class="mb-3">
+                                    <label for="imageQuality" class="form-label">Select the desired image quality</label>
+                                    <select class="form-select" id="imageQuality" name="imageQuality" required>
+                                        <option value="low">low</option>
+                                        <option value="medium" selected>medium</option>
+                                        <option value="high">high</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <button type="submit" class="btn btn-primary w-100">Generate Similar Image</button>
                         </form>
 
@@ -158,6 +171,7 @@
             const formData = new FormData();
             formData.append('referenceImage', document.getElementById('referenceImage').files[0]);
             formData.append('imageDescription', document.getElementById('imageDescription').value);
+            formData.append('imageQuality', document.getElementById('imageQuality').value);
 
             try {
                 const response = await fetch('/api/generate-reference-image/', {
