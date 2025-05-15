@@ -12,8 +12,4 @@ services:
       - DJANGO_SETTINGS_MODULE=social_media_generator.settings
     command: >
       sh -c "python manage.py migrate &&
-         gunicorn social_media_generator.wsgi:application 
-         --bind 0.0.0.0:8000 
-         --workers 4 
-         --timeout 500 
-         --reload"
+             gunicorn social_media_generator.wsgi:application --bind 0.0.0.0:8000 --workers 4  --timeout 400 --reload"
