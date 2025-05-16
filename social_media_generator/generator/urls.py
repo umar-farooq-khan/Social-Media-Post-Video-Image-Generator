@@ -8,5 +8,7 @@ urlpatterns = [
     path('custom-prompt/', views.custom_prompt, name='custom_prompt'),
     path('reference-image/', views.reference_image_generator, name='reference_image_generator'),
     path('generate-reference-image/', views.generate_reference_image, name='generate_reference_image'),
+    path('video-generator/', views.video_generator, name='video_generator'),
+    path('generate-video/', views.generate_video, name='generate_video'),
     path('healthcheck/', views.healthcheck, name='healthcheck'),
 ] 

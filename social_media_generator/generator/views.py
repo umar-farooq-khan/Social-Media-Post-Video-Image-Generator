@@ -17,6 +17,7 @@ from langchain.vectorstores.faiss import FAISS
 from dotenv import load_dotenv
 from pypdf import PdfReader
 import tempfile
+from huggingface_hub import InferenceClient
 
 # Load environment variables
 load_dotenv()
@@ -24,6 +25,18 @@ load_dotenv()
 # Configure OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# Configure Hugging Face
+hf_client = InferenceClient(
+    provider="hf-inference",
+    api_key="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",
+)
+
+# Configure fal-ai for video generation
+fal_client = InferenceClient(
+    provider="fal-ai",
+    api_key="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",
+)
 
 
 def index(request):
@@ -115,6 +128,18 @@ def generate_content(request):
                 Here are more details about the post: {generated_text[:100]}"""
 
             try:
+                # Generate image using Stable Diffusion
+                sd_image = hf_client.text_to_image(
+                    image_prompt,
+                    model="stabilityai/stable-diffusion-3.5-large",
+                )
+                
+                # Convert PIL Image to base64
+                buffered = BytesIO()
+                sd_image.save(buffered, format="PNG")
+                sd_image_base64 = base64.b64encode(buffered.getvalue()).decode()
+                sd_image_data = f"data:image/png;base64,{sd_image_base64}"
+
                 if uploaded_images:
                     # Use the first uploaded image
                     print("Reference image uploaded")
@@ -155,7 +180,8 @@ def generate_content(request):
                 return JsonResponse({
                     'status': 'success',
                     'generated_text': generated_text,
-                    'generated_image_url': generated_image_url
+                    'generated_image_url': generated_image_url,
+                    'sd_generated_image': sd_image_data  # Add Stable Diffusion image
                 })
 
             except Exception as e:
@@ -164,7 +190,8 @@ def generate_content(request):
                 return JsonResponse({
                     'status': 'success',
                     'generated_text': generated_text,
-                    'generated_image_url': None
+                    'generated_image_url': None,
+                    'sd_generated_image': None
                 })
 
         except Exception as e:
@@ -190,10 +217,12 @@ def generate_custom_content(request):
             business_name = request.POST.get('businessName', '')
             business_details = request.POST.get('businessDescription', '')
             custom_prompt = request.POST.get('customPrompt', '')
+            image_prompt = request.POST.get('imagePrompt', '')  # Get image prompt
             pdf_file = request.FILES.get('pdf_document')
             
             print(f"Received data - Business: {business_name}, Tone: {tone}, Style: {style}")
             print(f"Custom prompt: {custom_prompt}")
+            print(f"Image prompt: {image_prompt}")
             print(f"PDF file received: {pdf_file is not None}")
 
             # Process images
@@ -287,12 +316,44 @@ def generate_custom_content(request):
 
             generated_text = response.choices[0].message.content
             print(f"Generated text: {generated_text[:200]}...")
-            print("=== Process Complete ===")
 
-            return JsonResponse({
-                'status': 'success',
-                'generated_text': generated_text
-            })
+            # Generate images using both DALL-E and Stable Diffusion
+            try:
+                # Generate image using Stable Diffusion
+                sd_image = hf_client.text_to_image(
+                    image_prompt,
+                    model="stabilityai/stable-diffusion-3.5-large",
+                )
+                
+                # Convert PIL Image to base64
+                buffered = BytesIO()
+                sd_image.save(buffered, format="PNG")
+                sd_image_base64 = base64.b64encode(buffered.getvalue()).decode()
+                sd_image_data = f"data:image/png;base64,{sd_image_base64}"
+
+                # Generate image using DALL-E
+                result = client.images.generate(
+                    model="dall-e-3",
+                    prompt=image_prompt,
+                    size="1024x1024",
+                )
+                generated_image_url = result.data[0].url
+
+                return JsonResponse({
+                    'status': 'success',
+                    'generated_text': generated_text,
+                    'generated_image_url': generated_image_url,
+                    'sd_generated_image': sd_image_data
+                })
+
+            except Exception as e:
+                print(f"Error in image generation: {str(e)}")
+                return JsonResponse({
+                    'status': 'success',
+                    'generated_text': generated_text,
+                    'generated_image_url': None,
+                    'sd_generated_image': None
+                })
 
         except Exception as e:
             print(f"\n!!! Top Level Error in generate_custom_content !!!")
@@ -405,6 +466,42 @@ def generate_reference_image(request):
 def healthcheck(request):
     return JsonResponse({'status': 'ok'})
 
+@csrf_exempt
+def generate_video(request):
+    if request.method == 'POST':
+        try:
+            video_prompt = request.POST.get('videoPrompt', '')
+            print(f"Generating video with prompt: {video_prompt}")
+
+            # Generate video using fal-ai
+            video = fal_client.text_to_video(
+                video_prompt,
+                model="Lightricks/LTX-Video",
+            )
+
+            # Convert video to base64
+            video_base64 = base64.b64encode(video).decode()
+            video_data = f"data:video/mp4;base64,{video_base64}"
+
+            return JsonResponse({
+                'status': 'success',
+                'video_data': video_data
+            })
+
+        except Exception as e:
+            print(f"Error in video generation: {str(e)}")
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Invalid request method'
+    }, status=400)
+
+def video_generator(request):
+    return render(request, 'generator/video_generator.html')
 
 #git pull
 #sudo docker compose build

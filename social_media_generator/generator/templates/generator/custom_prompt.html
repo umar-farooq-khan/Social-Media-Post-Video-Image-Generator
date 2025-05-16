@@ -116,6 +116,16 @@
                                 </div>
                             </div>
 
+                            <!-- Image Prompt -->
+                            <div class="mb-4">
+                                <h4>Image Generation Settings</h4>
+                                <div class="mb-3">
+                                    <label for="imagePrompt" class="form-label">Image Prompt</label>
+                                    <textarea class="form-control" id="imagePrompt" name="imagePrompt" rows="2" 
+                                        placeholder="Describe the image you want to generate. For example: 'A modern office space with people collaborating' or 'A sleek product showcase with professional lighting'">A high-quality, realistic image of a professional workplace with  employees collaborating in a modern office setting doing a handshake.</textarea>
+                                </div>
+                            </div>
+
                             <!-- PDF Upload -->
                             <div class="mb-4">
                                 <h4>Upload PDF Document</h4>
@@ -145,10 +155,22 @@
                                     <p id="generatedText" class="card-text"></p>
                                 </div>
                             </div>
-                            <div id="imageSection" class="card mb-3" style="display: none;">
-                                <div class="card-body">
-                                    <h5 class="card-title">Generated Image</h5>
-                                    <img id="generatedImage" class="img-fluid rounded" style="max-width: 100%; height: auto;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title">OpenAI Generated Image</h5>
+                                            <img id="generatedImage" class="preview-image" src="" alt="DALL-E generated image">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Stable Diffusion Generated Image</h5>
+                                            <img id="sdGeneratedImage" class="preview-image" src="" alt="Stable Diffusion generated image">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -178,6 +200,7 @@
             formData.append('tone', document.getElementById('tone').value);
             formData.append('style', document.getElementById('style').value);
             formData.append('customPrompt', document.getElementById('customPrompt').value);
+            formData.append('imagePrompt', document.getElementById('imagePrompt').value);
 
             // Add PDF file if uploaded
             const pdfFile = document.getElementById('pdf_document').files[0];
@@ -199,6 +222,8 @@
                 if (data.status === 'success') {
                     // Display results
                     document.getElementById('generatedText').textContent = data.generated_text;
+                    document.getElementById('generatedImage').src = data.generated_image_url;
+                    document.getElementById('sdGeneratedImage').src = data.sd_generated_image;
                     document.querySelector('.result-section').style.display = 'block';
                 } else {
                     alert('Error: ' + data.message);

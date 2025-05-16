@@ -166,10 +166,22 @@
                                     <p id="generatedText" class="card-text"></p>
                                 </div>
                             </div>
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Generated Image</h5>
-                                    <img id="generatedImage" class="preview-image" src="" alt="Generated image">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title">OpenAI Generated Image</h5>
+                                            <img id="generatedImage" class="preview-image" src="" alt="DALL-E generated image">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Stable Diffusion Generated Image</h5>
+                                            <img id="sdGeneratedImage" class="preview-image" src="" alt="Stable Diffusion generated image">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -226,6 +238,7 @@
                     // Display results
                     document.getElementById('generatedText').textContent = data.generated_text;
                     document.getElementById('generatedImage').src = data.generated_image_url;
+                    document.getElementById('sdGeneratedImage').src = data.sd_generated_image;
                     document.querySelector('.result-section').style.display = 'block';
                 } else {
                     alert('Error: ' + data.message);
