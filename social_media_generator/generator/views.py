@@ -29,13 +29,13 @@ client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # Configure Hugging Face
 hf_client = InferenceClient(
     provider="hf-inference",
-    api_key="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",
+    api_key=os.getenv("HUGGINGFACE_API_KEY"),
 )
 
 # Configure fal-ai for video generation
 fal_client = InferenceClient(
     provider="fal-ai",
-    api_key="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",
+    api_key=os.getenv("FAL_AI_API_KEY"),
 )
 
 
