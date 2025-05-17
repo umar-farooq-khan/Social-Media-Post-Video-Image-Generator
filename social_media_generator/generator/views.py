@@ -18,7 +18,6 @@ from dotenv import load_dotenv
 from pypdf import PdfReader
 import tempfile
 from huggingface_hub import InferenceClient
-from bs4 import BeautifulSoup
 from PIL import Image, ImageDraw, ImageFont
 import io
 
