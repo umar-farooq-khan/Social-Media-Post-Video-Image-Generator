@@ -58,6 +58,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/api/video-generator">Video Generator</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/api/meme-generator">Meme Generator</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -65,7 +68,21 @@
 
     <div class="container py-5">
         <h1 class="text-center mb-4">Social Media Post Generator with your brand tone and style</h1>
-        
+        <h3 class="text-center mb-4">Note: Values are prefilled just to quickly test the app. You can still change the values.</h3>
+        <div class="d-flex justify-content-center">
+            <div class="text-center">
+                <ul class="mb-4 list-unstyled ">
+                    <li><strong>Backend:</strong> Django/ Python</li>
+                    <li><strong>Deployed on:</strong> AWS EC2</li>
+                    <li><strong>Closed Source Image Model:</strong> OpenAI Image-gpt-1 and DALL-E</li>
+                    <li><strong>Open Source Image Model:</strong> Stable-diffusion-3.5-large from HuggingFace</li>
+                    <li><strong>Open Source Video Model:</strong> Lightricks LTX-Video</li>
+                    <li><strong>Text Generation:</strong> OpenAI 4o-mini</li>
+                    <li><strong>RAG:</strong> LangChain, OpenAI Embeddings, FAISS Similarity Search</li>
+                    <li><strong>Frontend:</strong> Bootstrap</li>
+                </ul>
+            </div>
+        </div>
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card shadow">
@@ -142,13 +159,6 @@
                                 </div>
                             </div>
 
-                            <!-- Image Upload -->
-                            <div class="mb-4">
-                                <h4>Upload Reference Images (Optional)</h4>
-                                <div class="mb-3">
-                                    <input type="file" class="form-control" id="images" multiple accept="image/*">
-                                </div>
-                            </div>
                             <button type="submit" class="btn btn-primary w-100">Generate Post</button>
                         </form>
 

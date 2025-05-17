@@ -10,5 +10,7 @@ urlpatterns = [
     path('generate-reference-image/', views.generate_reference_image, name='generate_reference_image'),
     path('video-generator/', views.video_generator, name='video_generator'),
     path('generate-video/', views.generate_video, name='generate_video'),
+    path('meme-generator/', views.meme_generator, name='meme_generator'),
+    path('generate-meme/', views.generate_meme, name='generate_meme'),
     path('healthcheck/', views.healthcheck, name='healthcheck'),
 ] 

@@ -18,6 +18,9 @@ from dotenv import load_dotenv
 from pypdf import PdfReader
 import tempfile
 from huggingface_hub import InferenceClient
+from bs4 import BeautifulSoup
+from PIL import Image, ImageDraw, ImageFont
+import io
 
 # Load environment variables
 load_dotenv()
@@ -502,6 +505,82 @@ def generate_video(request):
 
 def video_generator(request):
     return render(request, 'generator/video_generator.html')
+
+def meme_generator(request):
+    return render(request, 'generator/meme_generator.html')
+
+@csrf_exempt
+def generate_meme(request):
+    if request.method == 'POST':
+        try:
+            # Get the uploaded image and text
+            meme_image = request.FILES.get('memeImage')
+            top_text = request.POST.get('topText', '')
+            bottom_text = request.POST.get('bottomText', '')
+
+            if not meme_image:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'No image provided'
+                }, status=400)
+
+            try:
+                # Read the uploaded file
+                image_data = BytesIO(meme_image.read())
+                image_data.seek(0)
+
+                # Create a temporary file to ensure proper MIME type
+                with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
+                    temp_file.write(image_data.getvalue())
+                    temp_file.flush()
+                    
+                    # Open the temporary file in binary mode
+                    with open(temp_file.name, 'rb') as image_file:
+                        # Combine the text into a prompt
+                        meme_text = f"{top_text} {bottom_text}".strip()
+                        prompt = f"Add this text to the image: {meme_text}"
+                        
+                        # Generate image using DALL-E
+                        result = client.images.edit(
+                            model="gpt-image-1",
+                            image=image_file,
+                            prompt=prompt,
+                            n=1,
+                            size="1024x1024"
+                        )
+
+                # Clean up the temporary file
+                os.unlink(temp_file.name)
+
+                # Get the base64 image data
+                image_b64 = result.data[0].b64_json
+                meme_url = f"data:image/png;base64,{image_b64}"
+
+                return JsonResponse({
+                    'status': 'success',
+                    'meme_url': meme_url,
+                    'top_text': top_text,
+                    'bottom_text': bottom_text
+                })
+
+            except Exception as e:
+                print(f"Error in image generation: {str(e)}")
+                return JsonResponse({
+                    'status': 'error',
+                    'message': f'Error generating image: {str(e)}'
+                }, status=500)
+
+        except Exception as e:
+            print(f"Error in generate_meme: {str(e)}")
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Invalid request method'
+    }, status=400)
 
 #git pull
 #sudo docker compose build
