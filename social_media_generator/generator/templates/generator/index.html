@@ -245,10 +245,10 @@
             formData.append('image_prompt', document.getElementById('imagePrompt').value);
             formData.append('previous_posts', JSON.stringify(previousPosts));
 
-            const imageFiles = document.getElementById('images').files;
-            for (let i = 0; i < imageFiles.length; i++) {
-                formData.append('images', imageFiles[i]);
-            }
+<!--            const imageFiles = document.getElementById('images').files;-->
+<!--            for (let i = 0; i < imageFiles.length; i++) {-->
+<!--                formData.append('images', imageFiles[i]);-->
+<!--            }-->
 
             try {
                 const response = await fetch('/api/generate/', {

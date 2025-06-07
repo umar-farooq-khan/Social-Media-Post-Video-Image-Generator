@@ -135,6 +135,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Create media directories if they don't exist
 os.makedirs(os.path.join(MEDIA_ROOT, 'generated_images'), exist_ok=True)
-
+SECURE_CROSS_ORIGIN_OPENER_POLICY=None
 # OpenAI API configuration
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
