@@ -305,11 +305,11 @@ def generate_custom_content(request):
             Tone: {tone}
             Style: {style}
             Custom Requirements: {custom_prompt}
-            Please create a post that matches the specified tone and style while incorporating the custom requirements and relevant context from both the business information and any uploaded document.
+            Please create a post that matches the specified tone and style while incorporating the custom requirements and relevant context from both the business information and any uploaded document. Should be two paragraphs with one line space with 3-4 lines each.
             """
             print("Sending request to OpenAI...")
             response = openai.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": "You are a social media marketing expert."},
                     {"role": "user", "content": prompt}

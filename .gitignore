@@ -5,3 +5,9 @@
 *.png
 social_media_generator/.env
 meme.jpg
+/social_media_generator/social_media_generator/__pycache__
+social_media_generator/social_media_generator/__pycache__/urls.cpython-312.pyc
+social_media_generator/social_media_generator/__pycache__/settings.cpython-312.pyc
+social_media_generator/generator/__pycache__/views.cpython-39.pyc
+social_media_generator/generator/__pycache__/views.cpython-312.pyc
+social_media_generator/generator/__pycache__/urls.cpython-312.pyc
