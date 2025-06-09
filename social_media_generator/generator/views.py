@@ -51,7 +51,6 @@ def generate_post(request):
                2. "Dive into the features of our new flex PCB FXUB06 & FXUB16 Antennas with David Connolly, Global Product Management Director. These antennas are designed to meet the demands of next-gen Cellular & IoT devices where space is tight, but performance can't be compromised! Want to see more? Check out their datasheets at the following links: https://bit.ly/3EycjRB  #4G hashtag#LTE # CellularTech hashtag#5G"
                3. "Every generation aspires to outdo its ancestors. That's true for both people and cellular technologies. In our latest engineering blog, we break down the key differences between 4G, LTE, and 5G and examine how mobile technology continues to evolve. Dive in here 👉 ​https://bit.ly/4iJv4j1 hashtag#4G hashtag#LTE hashtag#CellularTech hashtag#5G
                '''
-    
     # Get form data from request
     business_details = json.loads(request.POST.get('business_details', '{}'))
     business_name = business_details.get('name', 'Peak Antenna')
@@ -133,7 +132,7 @@ def generate_content(request):
                 # Generate image using Stable Diffusion
                 sd_image = hf_client.text_to_image(
                     image_prompt,
-                    model="stabilityai/stable-diffusion-3.5-large",
+                    model="stabilityai/stable-diffusion-3.5-large-turbo",
                 )
                 
                 # Convert PIL Image to base64
@@ -324,7 +323,7 @@ def generate_custom_content(request):
                 # Generate image using Stable Diffusion
                 sd_image = hf_client.text_to_image(
                     image_prompt,
-                    model="stabilityai/stable-diffusion-3.5-large",
+                    model="stabilityai/stable-diffusion-3.5-large-turbo",
                 )
                 
                 # Convert PIL Image to base64
